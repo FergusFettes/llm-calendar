@@ -1,0 +1,21 @@
+[project]
+name = "llm-calendar"
+version = "0.2a0"
+description = "Use an LLM to manage a simple Calendar."
+readme = "README.md"
+authors = [{name = "Fergus Fettes"}]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = ["llm"]
+
+[project.urls]
+Homepage = "https://github.com/fergusfettes/llm-calendar"
+Issues = "https://github.com/fergusfettes/llm-calendar/issues"
+
+[project.entry-points.llm]
+cmd = "llm_calendar"
+
+[project.optional-dependencies]
+test = ["pytest"]

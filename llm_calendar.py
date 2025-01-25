@@ -121,7 +121,7 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
 
 
 def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None, fancy: bool = True):
-    query = "SELECT * FROM events WHERE start_time >= ? ORDER BY start_time DESC"
+    query = "SELECT * FROM events WHERE start_time >= ? ORDER BY start_time ASC"
     params = [start_date]
     
     if end_date:
@@ -189,6 +189,7 @@ def register_commands(cli):
         model = llm.get_model(get_default_model())
         result = model.prompt(prompt, system=SYSTEM_PROMPT)
         
+        print(result)
         parsed = parse_command(result.text())
         if parsed:
             func_name, args, kwargs = parsed
