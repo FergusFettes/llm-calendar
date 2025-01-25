@@ -128,9 +128,35 @@ def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date:
 
     db = sqlite_utils.Database(logs_path)
     migrate(db)
-    events = db.query(query, params)
+    events = list(db.query(query, params))
+    
+    if not events:
+        print("No events found for this period.")
+        return
+
+    # Format the date range for the summary
+    start_desc = datetime.datetime.strptime(start_date, "%Y-%m-%d").strftime("%B %d, %Y")
+    if end_date:
+        end_desc = datetime.datetime.strptime(end_date, "%Y-%m-%d").strftime("%B %d, %Y")
+        period = f"between {start_desc} and {end_desc}"
+    else:
+        period = f"from {start_desc} onwards"
+
+    # Create the summary
+    if people:
+        people_str = " and ".join(people)
+        print(f"Found {len(events)} event(s) {period} involving {people_str}:")
+    else:
+        print(f"Found {len(events)} event(s) {period}:")
+
+    # List the events
     for event in events:
-        print(f"{event['start_time']}: {event['text']}")
+        event_date = datetime.datetime.strptime(event['start_time'], "%Y-%m-%d").strftime("%B %d")
+        if event['end_time'] and event['end_time'] != event['start_time']:
+            end_date = datetime.datetime.strptime(event['end_time'], "%Y-%m-%d").strftime("%B %d")
+            print(f"- {event_date} to {end_date}: {event['text']}")
+        else:
+            print(f"- {event_date}: {event['text']}")
 
 
 @llm.hookimpl
