@@ -141,17 +141,19 @@ def clear_events(start_date: str = None, end_date: str = None) -> int:
         return db["events"].delete_where()
     
     where = []
-    where_args = {}
+    where_args = []
     
     if start_date:
-        where.append("start_time >= :start")
-        where_args["start"] = start_date
+        where.append("start_time >= ?")
+        where_args.append(start_date)
     if end_date:
-        where.append("start_time <= :end")
-        where_args["end"] = end_date
+        where.append("start_time <= ?")
+        where_args.append(end_date)
         
     where_clause = " AND ".join(where)
-    return db["events"].delete_where(where_clause, where_args)
+    count =  db["events"].count_where(where_clause, where_args)
+    db["events"].delete_where(where_clause, where_args)
+    return count
 
 
 def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None, fancy: bool = True):
