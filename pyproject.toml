@@ -18,4 +18,4 @@ Issues = "https://github.com/fergusfettes/llm-calendar/issues"
 cmd = "llm_calendar"
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pytest-cov"]
