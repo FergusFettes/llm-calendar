@@ -121,7 +121,7 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
 
 
 def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None, fancy: bool = True):
-    query = "SELECT * FROM events WHERE start_time >= ? ORDER BY start_time ASC"
+    query = "SELECT * FROM events WHERE start_time >= ?"
     params = [start_date]
     
     if end_date:
@@ -131,6 +131,8 @@ def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date:
     if people:
         query += " AND people LIKE ?"
         params.append(f"%{','.join(people)}%")
+
+    query += "ORDER BY start_time ASC"
 
     db = sqlite_utils.Database(logs_path)
     migrate(db)
