@@ -130,6 +130,7 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
 
 def clear_events(start_date: str = None, end_date: str = None) -> int:
     """Clear events from the calendar within the given date range.
+    If only start_date is provided, clears events for just that day.
     Returns number of events deleted."""
     db = sqlite_utils.Database(logs_path)
     migrate(db)
@@ -146,9 +147,13 @@ def clear_events(start_date: str = None, end_date: str = None) -> int:
     if start_date:
         where.append("start_time >= ?")
         where_args.append(start_date)
-    if end_date:
-        where.append("start_time <= ?")
-        where_args.append(end_date)
+        # If no end_date provided, set it to same as start_date
+        if not end_date:
+            where.append("start_time <= ?")
+            where_args.append(start_date)
+        else:
+            where.append("start_time <= ?")
+            where_args.append(end_date)
         
     where_clause = " AND ".join(where)
     count =  db["events"].count_where(where_clause, where_args)
