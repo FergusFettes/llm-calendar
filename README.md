@@ -27,6 +27,12 @@ llm calendar "what events do I have next week?"
 llm calendar "when is mom visiting?"
 ```
 
+Clear your calendar:
+```bash
+llm calendar "clear all past events"
+llm calendar "clear next thursday"
+```
+
 The plugin will automatically interpret dates relative to today, handle multi-day events, and track people mentioned in events.
 
 ### Commands
