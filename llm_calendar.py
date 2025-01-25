@@ -149,14 +149,29 @@ def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date:
     else:
         print(f"Found {len(events)} event(s) {period}:")
 
-    # List the events
+    # Format events into a list
+    event_list = []
     for event in events:
         event_date = datetime.datetime.strptime(event['start_time'], "%Y-%m-%d").strftime("%B %d")
         if event['end_time'] and event['end_time'] != event['start_time']:
             end_date = datetime.datetime.strptime(event['end_time'], "%Y-%m-%d").strftime("%B %d")
-            print(f"- {event_date} to {end_date}: {event['text']}")
+            event_list.append(f"- {event_date} to {end_date}: {event['text']}")
         else:
-            print(f"- {event_date}: {event['text']}")
+            event_list.append(f"- {event_date}: {event['text']}")
+
+    # Create context for LLM
+    context = f"Here are the events {period}:\n" + "\n".join(event_list)
+    
+    # Get LLM to summarize
+    model = llm.get_model(get_default_model())
+    summary_prompt = f"""Given these calendar events, provide a natural, conversational summary:
+
+{context}
+
+Focus on the most important details and group related events. Be concise but friendly."""
+
+    result = model.prompt(summary_prompt)
+    print(result.text())
 
 
 @llm.hookimpl
