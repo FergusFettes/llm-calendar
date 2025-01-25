@@ -131,18 +131,26 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
 def clear_events(start_date: str = None, end_date: str = None) -> int:
     """Clear events from the calendar within the given date range.
     Returns number of events deleted."""
-    if not start_date:
-        raise ValueError("Warning: This will delete ALL events. Use a date range to delete specific events.")
-        
-    query = "DELETE FROM events WHERE start_time >= ?"
-    params = [start_date]
-    
-    if end_date:
-        query += " AND start_time <= ?"
-        params.append(end_date)
-
     db = sqlite_utils.Database(logs_path)
     migrate(db)
+
+    if not start_date and not end_date:
+        response = input("Warning: This will delete ALL events. Are you sure? (y/N): ")
+        if response.lower() != 'y':
+            return 0
+        query = "DELETE FROM events"
+        params = []
+    else:
+        query = []
+        params = []
+        if start_date:
+            query.append("start_time >= ?")
+            params.append(start_date)
+        if end_date:
+            query.append("start_time <= ?")
+            params.append(end_date)
+        query = "DELETE FROM events WHERE " + " AND ".join(query)
+
     return db.execute(query, params).rowcount
 
 
