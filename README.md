@@ -34,6 +34,7 @@ The plugin will automatically interpret dates relative to today, handle multi-da
 - `llm calendar [query]` - Add or query calendar events using natural language
 - `llm calendar dump` - Display all events in the database
 - `llm calendar query --no-fancy` - Query events without LLM-generated summaries
+- `llm calendar clear --start YYYY-MM-DD [--end YYYY-MM-DD]` - Delete events in date range
 
 ## Development
 

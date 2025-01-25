@@ -121,6 +121,24 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
          )
 
 
+def clear_events(start_date: str = None, end_date: str = None) -> int:
+    """Clear events from the calendar within the given date range.
+    Returns number of events deleted."""
+    if not start_date:
+        raise ValueError("Warning: This will delete ALL events. Use a date range to delete specific events.")
+        
+    query = "DELETE FROM events WHERE start_time >= ?"
+    params = [start_date]
+    
+    if end_date:
+        query += " AND start_time <= ?"
+        params.append(end_date)
+
+    db = sqlite_utils.Database(logs_path)
+    migrate(db)
+    return db.execute(query, params).rowcount
+
+
 def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None, fancy: bool = True):
     query = "SELECT * FROM events WHERE start_time >= ?"
     params = [start_date]
@@ -211,6 +229,20 @@ def register_commands(cli):
             if func_name == 'lookup_events':
                 kwargs['fancy'] = fancy
                 lookup_events(*args, **kwargs)
+
+    @calendar.command()
+    @click.option("--start", help="Start date (YYYY-MM-DD)")
+    @click.option("--end", help="End date (YYYY-MM-DD)")
+    def clear(start, end):
+        """Clear events from the calendar"""
+        try:
+            count = clear_events(start, end)
+            if count > 0:
+                print(f"Deleted {count} event(s)")
+            else:
+                print("No events found in that date range")
+        except ValueError as e:
+            print(str(e))
 
     @calendar.command()
     def dump():
