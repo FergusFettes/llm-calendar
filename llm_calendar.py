@@ -121,7 +121,7 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
 
 
 def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None, fancy: bool = True):
-    query = "SELECT * FROM events WHERE start_time >= ?"
+    query = "SELECT * FROM events WHERE start_time >= ? ORDER BY start_time DESC"
     params = [start_date]
     
     if end_date:
