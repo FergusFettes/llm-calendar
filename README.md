@@ -1,57 +1,54 @@
-# llm-cmd
+# llm-calendar
 
-[![PyPI](https://img.shields.io/pypi/v/llm-cmd.svg)](https://pypi.org/project/llm-cmd/)
-[![Changelog](https://img.shields.io/github/v/release/simonw/llm-cmd?include_prereleases&label=changelog)](https://github.com/simonw/llm-cmd/releases)
-[![Tests](https://github.com/simonw/llm-cmd/actions/workflows/test.yml/badge.svg)](https://github.com/simonw/llm-cmd/actions/workflows/test.yml)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/llm-cmd/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/fergusfettes/llm-calendar/blob/main/LICENSE)
 
-Use LLM to generate and execute commands in your shell
+Use LLM to manage your calendar events using natural language
 
 ## Installation
 
 Install this plugin in the same environment as [LLM](https://llm.datasette.io/).
 ```bash
-llm install llm-cmd
+llm install llm-calendar
 ```
+
 ## Usage
 
-This command could be **very dangerous**. Do not use this unless you are confident you understand what it does and are sure you could spot if it is likely to do something dangerous.
+The calendar plugin allows you to manage calendar events using natural language. It uses your [default LLM model](https://llm.datasette.io/en/stable/setup.html#setting-a-custom-default-model) to interpret commands and queries.
 
-Run `llm cmd` like this:
-
+Add events like this:
 ```bash
-llm cmd undo last git commit
+llm calendar "dentist on 5th May"
+llm calendar "mom visiting next week for 3 days"
 ```
-It will use your [default model](https://llm.datasette.io/en/stable/setup.html#setting-a-custom-default-model) to generate the corresponding shell command.
 
-This will then be displayed in your terminal ready for you to edit it, or hit `<enter>` to execute the prompt.
+Query your calendar:
+```bash
+llm calendar "what events do I have next week?"
+llm calendar "when is mom visiting?"
+```
 
-If the command doesnt't look right, hit `Ctrl+C` to cancel.
+The plugin will automatically interpret dates relative to today, handle multi-day events, and track people mentioned in events.
 
-## The system prompt
+### Commands
 
-This is the prompt used by this tool:
-
-> Return only the command to be executed as a raw string, no string delimiters
-wrapping it, no yapping, no markdown, no fenced code blocks, what you return
-will be passed to subprocess.check_output() directly.
->
-> For example, if the user asks: undo last git commit
->
-> You return only: git reset --soft HEAD~1
+- `llm calendar [query]` - Add or query calendar events using natural language
+- `llm calendar dump` - Display all events in the database
+- `llm calendar query --no-fancy` - Query events without LLM-generated summaries
 
 ## Development
 
 To set up this plugin locally, first checkout the code. Then create a new virtual environment:
 ```bash
-cd llm-cmd
+cd llm-calendar
 python3 -m venv venv
 source venv/bin/activate
 ```
-Now install the dependencies and test dependencies:
+
+Install the dependencies and test dependencies:
 ```bash
-llm install -e '.[test]'
+pip install -e '.[test]'
 ```
+
 To run the tests:
 ```bash
 pytest
