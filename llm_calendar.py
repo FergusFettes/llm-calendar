@@ -4,11 +4,17 @@ import click
 import llm
 import subprocess
 import sqlite_utils
-from typing import List
+from typing import List, Optional
 
 from llm.migrations import migration, migrate
 from llm.cli import get_default_model
 from llm import user_dir
+
+SUMMARY_PROMPT = """Given these calendar events, provide a natural, conversational summary:
+
+{context}
+
+Focus on the most important details and group related events. Be concise but friendly."""
 
 
 logs_path = user_dir() / "logs.db"
@@ -114,7 +120,7 @@ def add_entry(start_time, text, end_time=None, people=None, prompt=None):
          )
 
 
-def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None):
+def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date: str = None, people: List = None, fancy: bool = True):
     query = "SELECT * FROM events WHERE start_time >= ?"
     params = [start_date]
     
@@ -159,26 +165,26 @@ def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date:
         else:
             event_list.append(f"- {event_date}: {event['text']}")
 
-    # Create context for LLM
-    context = f"Here are the events {period}:\n" + "\n".join(event_list)
+    # Print the events
+    print("\n".join(event_list))
     
-    # Get LLM to summarize
-    model = llm.get_model(get_default_model())
-    summary_prompt = f"""Given these calendar events, provide a natural, conversational summary:
-
-{context}
-
-Focus on the most important details and group related events. Be concise but friendly."""
-
-    result = model.prompt(summary_prompt)
-    print(result.text())
+    if fancy:
+        # Create context for LLM
+        context = f"Here are the events {period}:\n" + "\n".join(event_list)
+        
+        # Get LLM to summarize
+        model = llm.get_model(get_default_model())
+        result = model.prompt(SUMMARY_PROMPT.format(context=context))
+        print("\nSummary:")
+        print(result.text())
 
 
 @llm.hookimpl
 def register_commands(cli):
     @cli.command()
     @click.argument("args", nargs=-1)
-    def calendar(args):
+    @click.option("--fancy/--no-fancy", default=True, help="Use LLM to generate natural language summaries")
+    def calendar(args, fancy):
         prompt = datetime.datetime.now().strftime('%A, %d %B %Y %I:%M%p %Z') + " ".join(args)
         model = llm.get_model(get_default_model())
         result = model.prompt(prompt, system=SYSTEM_PROMPT)
@@ -189,6 +195,7 @@ def register_commands(cli):
             if func_name == 'add_entry':
                 add_entry(*args, **kwargs, prompt=prompt)
             if func_name == 'lookup_events':
+                kwargs['fancy'] = fancy
                 lookup_events(*args, **kwargs)
 
     @cli.command()
