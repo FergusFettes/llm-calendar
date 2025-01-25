@@ -43,6 +43,12 @@ query: what's happening next week?
 answer: lookup_events("2024-01-15", "2024-01-21")      # Based on given date, guess dates for next Monday and Sunday
 query: what's on the calendar after March?
 answer: lookup_events("2024-03-01")
+query: clear all events from January
+answer: clear_events("2024-01-01", "2024-01-31")
+query: delete everything after summer
+answer: clear_events("2024-09-01")
+query: wipe March and April clean
+answer: clear_events("2024-03-01", "2024-04-30")
 
 Return only the command to be executed as a raw string, no string delimiters
 wrapping it, no yapping, no markdown, no fenced code blocks, what you return
