@@ -183,10 +183,16 @@ def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date:
 
 @llm.hookimpl
 def register_commands(cli):
-    @cli.command()
+    @cli.group()
+    def calendar():
+        """Manage your calendar events"""
+        pass
+
+    @calendar.command()
     @click.argument("args", nargs=-1)
     @click.option("--fancy/--no-fancy", default=True, help="Use LLM to generate natural language summaries")
-    def calendar(args, fancy):
+    def query(args, fancy):
+        """Query your calendar using natural language"""
         prompt = datetime.datetime.now().strftime('%A, %d %B %Y %I:%M%p %Z') + " ".join(args)
         model = llm.get_model(get_default_model())
         result = model.prompt(prompt, system=SYSTEM_PROMPT)
@@ -201,7 +207,7 @@ def register_commands(cli):
                 kwargs['fancy'] = fancy
                 lookup_events(*args, **kwargs)
 
-    @cli.command()
+    @calendar.command()
     def dump():
         """Print all events in the database"""
         db = sqlite_utils.Database(logs_path)
