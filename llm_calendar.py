@@ -25,6 +25,7 @@ SYSTEM_PROMPT = """
 Available tools:
 - add_entry(start_time: str, text: str, end_time: str = None, people: Optional[List] = None)
 - lookup_events(start_date: str = date.today().isoformat(), end_date: str = None, people: Optional[List] = None)
+- clear_events(start_date: str, end_date: str = None)
 
 Any queries related to past or future events should be returned in the appropriate format.
 
@@ -235,6 +236,12 @@ def register_commands(cli):
             if func_name == 'lookup_events':
                 kwargs['fancy'] = fancy
                 lookup_events(*args, **kwargs)
+            if func_name == 'clear_events':
+                count = clear_events(*args, **kwargs)
+                if count > 0:
+                    print(f"Deleted {count} event(s)")
+                else:
+                    print("No events found in that date range")
 
     @calendar.command()
     @click.option("--start", help="Start date (YYYY-MM-DD)")
