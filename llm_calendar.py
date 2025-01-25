@@ -5,6 +5,7 @@ import llm
 import subprocess
 import sqlite_utils
 from typing import List, Optional
+from click_default_group import DefaultGroup
 
 from llm.migrations import migration, migrate
 from llm.cli import get_default_model
@@ -183,7 +184,11 @@ def lookup_events(start_date: str = datetime.date.today().isoformat(), end_date:
 
 @llm.hookimpl
 def register_commands(cli):
-    @cli.group()
+    @cli.group(
+           cls=DefaultGroup,
+           default='query',
+           default_if_no_args=True
+       )
     def calendar():
         """Manage your calendar events"""
         pass
